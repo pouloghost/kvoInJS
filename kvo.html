@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>kvo</title>
+  <meta name="description" content="">
+  <meta name="author" content="i-zhangty">
+  <meta name="viewport" content="width=device-width; initial-scale=1.0">
+  
+  <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+<script>
+function Observer(obj,method){
+	this.obj = obj;
+	this.method = method;
+}
+Array.prototype.removeObject = function(obj){
+	for(i in this){
+		if(this[i].equals(obj)){
+			 this.splice(i,1);
+		}
+	}
+};
+function equalCompatibilize(obj){
+	obj.prototype.equals = function(val){
+		for(i in obj){
+			if(val.hasOwnProperty(i)){
+				if(obj[i]!=val[i])
+				return false;
+			}else{
+				return false;
+			}
+		}
+	}
+};
+function kvoCompatibilize (obj,key){//add a observer array and setter for the key
+	var observerPropertyName = key+'Observers';
+	var setterMethodName = 'set'+key.replace(key[0],key[0].toUpperCase());
+	if(obj.hasOwnProperty(observerPropertyName)&&obj.hasOwnProperty(setterMethodName)){
+		return;
+	}else{
+		obj[observerPropertyName] = new Array();
+		obj[setterMethodName] = function(val){
+			obj[key] = val;
+			for ()
+		};
+	}
+}
+</script>
+</head>
+
+<body>
+
+</body>
+</html>
