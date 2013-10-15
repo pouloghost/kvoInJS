@@ -1,21 +1,31 @@
-function Observer(obj,mtd){
+Array.prototype.removeObject = function(obj){
+		for(i in this){
+			if(this[i].hasOwnProperty('equals') && this[i].equals(obj)){
+				this.splice(i,1);
+				return;
+			}
+		}
+	};
+Array.prototype.containObject = function(obj){
+	for(i in this){
+		console.log(this[i].toString());
+		console.log(obj.toString());
+		if(this[i].hasOwnProperty('equals') && this[i].equals(obj)){
+			return true;
+		}
+	}
+	return false;
+}	
+	function Observer(obj,mtd){
 		this.obj = obj;
 		this.mtd = mtd;
 	}
 	function equalCompatibilize(cls){
-		if(cls.prototype.hasOwnProperty('equals')){
+		if(cls.prototype&&cls.prototype.hasOwnProperty('equals')){
 			return;
 		}
 		cls.prototype.equals = function(val){
 			return this.toString()==val.toString();
-		}
-	};
-	Array.prototype.removeObject = function(obj){
-		for(i in this){
-			if(this[i]!=Array.prototype.removeObject && this[i].equals(obj)){
-				this.splice(i,1);
-				return;
-			}
 		}
 	};
 function kvoCompatibilize (obj,key){//add a observer array and setter for the key
@@ -39,8 +49,11 @@ function kvoCompatibilize (obj,key){//add a observer array and setter for the ke
 			Object.defineProperty(obj,key,{'set':function(val){
 				obj[oldSetterName] = oldSetter;// store for rollback
 				obj[oldSetterName](val);
-				for (observer in obj[observerPropertyName]){
-					observer.mtd.call(observer.obj,val);
+				for (i in obj[observerPropertyName]){
+					var observer = obj[observerPropertyName][i];
+					if(observer.hasOwnProperty('mtd')){
+						observer.mtd.call(observer.obj,val);
+					}
 				}
 			}});
 		}else{
@@ -51,8 +64,9 @@ function kvoCompatibilize (obj,key){//add a observer array and setter for the ke
 				obj['_'+key] = val;
 				for (i in obj[observerPropertyName]){
 					var observer = obj[observerPropertyName][i];
-					console.log(observer);
-					observer.mtd.call(observer.obj,val);
+					if(observer.hasOwnProperty('mtd')){
+						observer.mtd.call(observer.obj,val);
+					}
 				}
 			},'get':function(){return obj['_'+key]}});
 		}
@@ -76,7 +90,11 @@ function kvoDecompatibilize(obj,key){
 }
 function addObserverForKeyInObj(observer,mtd,key,obj){
 	kvoCompatibilize(obj,key);
-	obj[key+'Observers'].push(new Observer(observer,mtd));
+	var obs = new Observer(observer,mtd);
+	if(!obj[key+'Observers'].containObject(obs)){
+		obj[key+'Observers'].push(obs);
+	}
+	console.log(obj[key+'Observers'].length);
 }
 
 function removeObserverForKeyInObj(observer,mtd,key,obj){
@@ -88,7 +106,10 @@ var a = {'a': 'ddsaf'};
 var b = {'observe':function(val){
 	console.log(val);
 }};
-console.log('ddd'+b['observe']);
+
+equalCompatibilize(b.constructor);
+equalCompatibilize(Observer);
+addObserverForKeyInObj(b,b['observe'],'a',a);
 addObserverForKeyInObj(b,b['observe'],'a',a);
 a.a = 'aaaaa';
 console.log('set');
