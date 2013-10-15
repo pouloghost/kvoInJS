@@ -1,6 +1,6 @@
 Array.prototype.removeObject = function(obj){
 		for(i in this){
-			if(this[i].hasOwnProperty('equals') && this[i].equals(obj)){
+		if(this[i].constructor.prototype.hasOwnProperty('equals') && this[i].equals(obj)){
 				this.splice(i,1);
 				return;
 			}
@@ -8,9 +8,7 @@ Array.prototype.removeObject = function(obj){
 	};
 Array.prototype.containObject = function(obj){
 	for(i in this){
-		console.log(this[i].toString());
-		console.log(obj.toString());
-		if(this[i].hasOwnProperty('equals') && this[i].equals(obj)){
+		if(this[i].constructor.prototype.hasOwnProperty('equals') && this[i].equals(obj)){
 			return true;
 		}
 	}
@@ -103,15 +101,16 @@ function removeObserverForKeyInObj(observer,mtd,key,obj){
 }
 
 var a = {'a': 'ddsaf'};
-var b = {'observe':function(val){
-	console.log(val);
+var b = {'v':10, 'observe':function(val){
+	console.log(this.v + val);
 }};
-
+var c = {'v':11, 'observe':function(val){
+	console.log(this.v+'  c   '+val);
+}};
 equalCompatibilize(b.constructor);
 equalCompatibilize(Observer);
 addObserverForKeyInObj(b,b['observe'],'a',a);
-addObserverForKeyInObj(b,b['observe'],'a',a);
+addObserverForKeyInObj(b,c['observe'],'a',a);
 a.a = 'aaaaa';
-console.log('set');
 removeObserverForKeyInObj(b,b.observe,'a',a);
 a.a = 'bbbbb';
