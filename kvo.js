@@ -14,18 +14,28 @@ Array.prototype.containObject = function(obj){
 	}
 	return false;
 }	
-	function Observer(obj,mtd){
-		this.obj = obj;
-		this.mtd = mtd;
+function Observer(obj,mtd){
+	this.obj = obj;
+	this.mtd = mtd;
+}
+function equalCompatibilize(cls){
+	if(cls.prototype&&cls.prototype.hasOwnProperty('equals')){
+		return;
 	}
-	function equalCompatibilize(cls){
-		if(cls.prototype&&cls.prototype.hasOwnProperty('equals')){
-			return;
+	cls.prototype.equals = function(val){
+		if(val instanceof cls){//class compare
+			for (i in val){
+				switch(typeof val[i]){
+					
+				}
+			}
+		}else{
+			return false;//not the same class
 		}
-		cls.prototype.equals = function(val){
-			return this.toString()==val.toString();
-		}
-	};
+		console.log(val.constructor.toString());
+		return this.toString()==val.toString();
+	}
+};
 function kvoCompatibilize (obj,key){//add a observer array and setter for the key
 	var observerPropertyName = key+'Observers';
 	var oldSetterName = '_set'+key.replace(key[0],key[0].toUpperCase());
@@ -44,8 +54,8 @@ function kvoCompatibilize (obj,key){//add a observer array and setter for the ke
 		var oldSetter = Object.getOwnPropertyDescriptor(obj,key)['set'];//old setter
 		// obj[setterMethodName]
 		if(oldSetter){
+			obj[oldSetterName] = oldSetter;// store for rollback
 			Object.defineProperty(obj,key,{'set':function(val){
-				obj[oldSetterName] = oldSetter;// store for rollback
 				obj[oldSetterName](val);
 				for (i in obj[observerPropertyName]){
 					var observer = obj[observerPropertyName][i];
@@ -82,6 +92,10 @@ function kvoDecompatibilize(obj,key){
 			if(obj[oldSetterName]){
 				Object.defineProperty(obj,key,{'set':obj[oldSetterName]});
 				delete obj[oldSetterName];
+			}else{// reset the default set and get for property that didn't have an old one
+				delete obj[key];
+				obj[key] = obj['_' + key];
+				delete obj['_' + key];
 			}
 		}
 	}

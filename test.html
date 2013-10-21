@@ -1,0 +1,52 @@
+<html>
+<head>
+<script type="text/javascript">
+function equalCompatibilize(cls){
+	if(cls.prototype&&cls.prototype.hasOwnProperty('equals')){
+		return;
+	}
+	cls.prototype.equals = function(val){
+		if(val instanceof cls){//class compare
+			for (i in val){
+				switch(typeof val[i]){
+					case 'number':
+					case 'boolean':
+					case 'string':
+						if(val[i]!=this[i]){
+							return false;
+						}else{
+							break;
+						}
+					case 'function':
+						console.log(val[i].toString());
+						break;
+					case 'object':
+						console.log(val[i].toString());
+						break;
+				}
+			}
+		}else{
+			console.log('not same class');
+			return false;//not the same class
+		}
+		return true;
+	}
+};
+function foo (){
+	this.doo={
+		a:1,b:3
+	},
+	this.taa=function(){
+		return 9;
+	}
+}
+var a = new foo();
+var b = new foo();
+b.constructor.prototype.a = 'aaa';
+b.doo.a = 21;
+equalCompatibilize(foo);
+document.write(a.equals(b));
+</script>
+
+<head>
+</html>
