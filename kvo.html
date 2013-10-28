@@ -5,10 +5,26 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<title>kvo</title>
 	<meta name="description" content="">
-	<meta name="author" content="i-zhangty">
+	<meta name="author" content="GT">
 
-	<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
 	<script src="kvo.js"></script>
+	<script type="text/javascript">
+	//sample code here
+var publisher = {'foo': 'hello'};
+var observer0 = {'name':'observer0', 'observe':function(val){
+	console.log(this.name + ' observes ' + val);
+}};
+var observer1 = {'name':'observer1', 'observe':function(val){
+	console.log(this.name + ' observes ' + val);
+}};
+equalCompatibilize(observer0.constructor);
+equalCompatibilize(Observer);
+addObserverForKeyInObj(observer0,observer0['observe'],'foo',publisher);
+addObserverForKeyInObj(observer1,observer0['observe'],'foo',publisher);
+publisher.foo = 'changed';
+removeObserverForKeyInObj(observer0,observer0['observe'],'foo',publisher);
+publisher.foo = 'changed again';
+	</script>
 </head>
 
 <body>

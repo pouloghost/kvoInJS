@@ -26,14 +26,42 @@ function equalCompatibilize(cls){
 		if(val instanceof cls){//class compare
 			for (i in val){
 				switch(typeof val[i]){
-					
+					case 'number':
+					case 'boolean':
+					case 'string':
+						if(val[i] != this[i]){
+							return false;
+						}else{
+							break;
+						}
+					case 'function':
+						if (this[i].toString() == val[i].toString()) {
+							break;
+						} else {
+							//functions can be compared by toString();
+							return false;
+						};
+						break;
+					case 'object':
+						//equalcompatibilize the class
+						//may be changed
+						if (val[i] instanceof this[i].constructor) {
+							equalCompatibilize(this[i].constructor);
+							if (val[i].equals (this[i])){
+								break;
+							} else {
+								return false;
+							}
+						} else {
+							return false;//not the same class
+						};
+						break;
 				}
 			}
 		}else{
 			return false;//not the same class
 		}
-		console.log(val.constructor.toString());
-		return this.toString()==val.toString();
+		return true;
 	}
 };
 function kvoCompatibilize (obj,key){//add a observer array and setter for the key
@@ -106,25 +134,12 @@ function addObserverForKeyInObj(observer,mtd,key,obj){
 	if(!obj[key+'Observers'].containObject(obs)){
 		obj[key+'Observers'].push(obs);
 	}
-	console.log(obj[key+'Observers'].length);
+	console.log('add ' + obj[key+'Observers'].length);
 }
 
 function removeObserverForKeyInObj(observer,mtd,key,obj){
 	obj[key+'Observers'].removeObject(new Observer(observer,mtd));
 	kvoDecompatibilize(obj,key);
+	console.log('remove ' + obj[key+'Observers'].length);
 }
 
-var a = {'a': 'ddsaf'};
-var b = {'v':10, 'observe':function(val){
-	console.log(this.v + val);
-}};
-var c = {'v':11, 'observe':function(val){
-	console.log(this.v+'  c   '+val);
-}};
-equalCompatibilize(b.constructor);
-equalCompatibilize(Observer);
-addObserverForKeyInObj(b,b['observe'],'a',a);
-addObserverForKeyInObj(b,c['observe'],'a',a);
-a.a = 'aaaaa';
-removeObserverForKeyInObj(b,b.observe,'a',a);
-a.a = 'bbbbb';
