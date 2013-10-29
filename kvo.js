@@ -35,7 +35,7 @@ function equalCompatibilize(cls){
 							break;
 						}
 					case 'function':
-						if (this[i].toString() == val[i].toString()) {
+						if (this[i].toString().replace(/\s/g,'') == val[i].toString().replace(/\s/g,'') ) {//functions are identical if they are the same apart from white spaces
 							break;
 						} else {
 							//functions can be compared by toString();
